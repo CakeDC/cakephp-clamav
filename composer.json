@@ -1,0 +1,23 @@
+{
+    "name": "cakedc/cakephp-clamav",
+    "description": "cakedc/cakephp-clamav plugin for CakePHP",
+    "type": "cakephp-plugin",
+    "license": "MIT",
+    "require": {
+        "cakephp/cakephp": "^3.8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7|^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "CakeDC\\Clamav\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CakeDC\\Clamav\\Test\\": "tests",
+            "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
+        }
+    }
+}
