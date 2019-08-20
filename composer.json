@@ -7,17 +7,17 @@
         "cakephp/cakephp": "^3.8"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7|^6.0"
+        "phpunit/phpunit": "^5.7.14|^6.0"
     },
     "autoload": {
         "psr-4": {
-            "CakeDC\\Clamav\\": "src"
+            "CakeDC\\Clamav\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "CakeDC\\Clamav\\Test\\": "tests",
-            "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
+            "Cake\\Test\\": "vendor/cakephp/cakephp/tests/",
+            "CakeDC\\Clamav\\Test\\": "tests/"
         }
     }
 }
