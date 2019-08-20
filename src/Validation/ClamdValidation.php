@@ -44,10 +44,12 @@ class ClamdValidation extends Validator
         } catch (\Exception $ex) {
             $message = __d(
                 'cake_d_c/clamav',
-                'Exception while checking the file {0} for viruses: {1}', $tmpName, $ex->getMessage()
+                'Exception while checking the file {0} for viruses: {1}',
+                $tmpName,
+                $ex->getMessage()
             );
             Log::warning($message);
-            
+
             return $message;
         }
 
