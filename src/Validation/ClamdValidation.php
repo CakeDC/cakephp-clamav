@@ -34,7 +34,7 @@ class ClamdValidation extends Validator
     /**
      * Use clamd socket to scan the uploaded tmp file
      *
-     * @param $check
+     * @param $check value to check
      * @return bool|string
      */
     public function fileHasNoVirusesFound($check)
@@ -71,7 +71,7 @@ class ClamdValidation extends Validator
     /**
      * Use clamd socket to retrieve virus scan from clamd
      *
-     * @param string $tmpName
+     * @param string $tmpName path to file to scan
      * @return mixed
      */
     protected function clamdScan(string $tmpName)
@@ -98,7 +98,7 @@ class ClamdValidation extends Validator
      * @param string $tmpName path to the file
      * @param Socket $socket socket to write
      */
-    protected function sendInstream($tmpName, $socket)
+    protected function sendInstream(string $tmpName, \Cake\Network\Socket $socket)
     {
         $fhandler = fopen($tmpName, "r");
         $streamMaxLength = Configure::read('CakeDC/Clamav.streamMaxLength', 25 * 1024 * 1024);
@@ -122,7 +122,7 @@ class ClamdValidation extends Validator
     /**
      * Get Socket instance for DI
      *
-     * @param array $config
+     * @param array $config socket configuration
      * @return Socket
      */
     protected function getSocketInstance(array $config)
@@ -133,10 +133,10 @@ class ClamdValidation extends Validator
     /**
      * Check scan result and return error msg or true if OK
      *
-     * @param $result
+     * @param $result string result from clamad
      * @return bool|string
      */
-    protected function checkScanResult($result)
+    protected function checkScanResult(string $result)
     {
         $virusFoundSuffix = ' FOUND' . PHP_EOL;
         $okSuffix = ' OK' . PHP_EOL;
