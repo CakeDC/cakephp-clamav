@@ -11,14 +11,13 @@
 
 namespace CakeDC\Clamd\Test\Validation;
 
+use CakeDC\Clamav\Network\Socket;
+use CakeDC\Clamav\Validation\ClamdValidation;
 use Cake\Cache\Cache;
 use Cake\Cache\Engine\NullEngine;
 use Cake\Core\Configure;
 use Cake\Network\Exception\SocketException;
 use Cake\TestSuite\TestCase;
-use Cake\Validation\Validator;
-use CakeDC\Clamav\Network\Socket;
-use CakeDC\Clamav\Validation\ClamdValidation;
 
 /**
  * @property ClamdValidation ClamdValidation

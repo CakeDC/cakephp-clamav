@@ -11,10 +11,10 @@
 
 namespace CakeDC\Clamav\Validation;
 
+use CakeDC\Clamav\Network\Socket;
 use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\Validation\Validator;
-use CakeDC\Clamav\Network\Socket;
 
 /**
  * Class ClamdValidation
