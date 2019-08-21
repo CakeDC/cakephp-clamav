@@ -17,6 +17,7 @@ use Cake\Core\Configure;
 use Cake\Network\Exception\SocketException;
 use Cake\TestSuite\TestCase;
 use Cake\Validation\Validator;
+use CakeDC\Clamav\Network\Socket;
 use CakeDC\Clamav\Validation\ClamdValidation;
 
 /**
@@ -113,6 +114,76 @@ class ClamdValidationTest extends TestCase
             ->method('clamdScan')
             ->with(reset($check))
             ->willReturn('virus.exe some virus OK' . PHP_EOL);
+        $this->assertSame(true, $clamdValidatorMock->fileHasNoVirusesFound($check));
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function testValidationCheckModeScan()
+    {
+        Configure::write('CakeDC/Clamav.enabled', true);
+        Configure::write('CakeDC/Clamav.socketConfig', ['socketConfig']);
+        Configure::write('CakeDC/Clamav.mode', $this->ClamdValidation::MODE_SCAN);
+        $filePath = TESTS . 'Fixture/files/testfile.txt';
+        $check = ['tmp_name' => $filePath];
+        $socketMock = $this->getMockBuilder(Socket::class)
+            ->setMethods(['write', 'read'])
+            ->getMock();
+        $socketMock->expects($this->at(0))
+            ->method('write')
+            ->with("SCAN " . $filePath)
+            ->willReturn(true);
+        $socketMock->expects($this->at(1))
+            ->method('read')
+            ->willReturn('virus.exe some virus OK' . PHP_EOL);
+        $clamdValidatorMock = $this->getMockBuilder(ClamdValidation::class)
+            ->setMethods(['getSocketInstance'])
+            ->getMock();
+        $clamdValidatorMock->expects($this->once())
+            ->method('getSocketInstance')
+            ->with(['socketConfig'])
+            ->willReturn($socketMock);
+        $this->assertSame(true, $clamdValidatorMock->fileHasNoVirusesFound($check));
+    }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function testValidationCheckModeInStream()
+    {
+        Configure::write('CakeDC/Clamav.enabled', true);
+        Configure::write('CakeDC/Clamav.socketConfig', ['socketConfig']);
+        Configure::write('CakeDC/Clamav.mode', $this->ClamdValidation::MODE_INSTREAM);
+        $filePath = TESTS . 'Fixture/files/testfile.txt';
+        $check = ['tmp_name' => $filePath];
+        $socketMock = $this->getMockBuilder(Socket::class)
+            ->setMethods(['write', 'read'])
+            ->getMock();
+        $socketMock->expects($this->at(0))
+            ->method('write')
+            ->with("nINSTREAM" . PHP_EOL)
+            ->willReturn(true);
+        $socketMock->expects($this->at(1))
+            ->method('write')
+            ->with("\000\000\000!this file might contain a v1rus ?")
+            ->willReturn(true);
+        $socketMock->expects($this->at(2))
+            ->method('write')
+            ->with("\000\000\000\000")
+            ->willReturn(true);
+        $socketMock->expects($this->at(3))
+            ->method('read')
+            ->willReturn('virus.exe some virus OK' . PHP_EOL);
+        $clamdValidatorMock = $this->getMockBuilder(ClamdValidation::class)
+            ->setMethods(['getSocketInstance'])
+            ->getMock();
+        $clamdValidatorMock->expects($this->once())
+            ->method('getSocketInstance')
+            ->with(['socketConfig'])
+            ->willReturn($socketMock);
         $this->assertSame(true, $clamdValidatorMock->fileHasNoVirusesFound($check));
     }
 }
