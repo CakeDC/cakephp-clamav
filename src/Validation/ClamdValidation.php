@@ -16,9 +16,20 @@ use Cake\Log\Log;
 use Cake\Validation\Validator;
 use CakeDC\Clamav\Network\Socket;
 
+/**
+ * Class ClamdValidation
+ * Validation class to handle ClamAV daemon virus check
+ *
+ * @package CakeDC\Clamav\Validation
+ */
 class ClamdValidation extends Validator
 {
     const TMP_UPLOAD_KEY = 'tmp_name';
+
+    // SCAN mode will check files in the local filesystem
+    const MODE_SCAN = 'SCAN';
+    // INSTREAM mode will send the file as a stream to the server
+    const MODE_INSTREAM = 'INSTREAM';
 
     /**
      * Use clamd socket to scan the uploaded tmp file
@@ -44,7 +55,8 @@ class ClamdValidation extends Validator
         } catch (\Exception $ex) {
             $message = __d(
                 'cake_d_c/clamav',
-                'Exception while checking the file {0} for viruses: {1}',
+                '{0} while checking the file {1} for viruses: {2}',
+                get_class($ex),
                 $tmpName,
                 $ex->getMessage()
             );
@@ -65,9 +77,48 @@ class ClamdValidation extends Validator
     protected function clamdScan(string $tmpName)
     {
         $socket = $this->getSocketInstance(Configure::read('CakeDC/Clamav.socketConfig'));
-        $socket->write('SCAN ' . $tmpName);
+        $mode = Configure::read('CakeDC/Clamav.mode', static::MODE_SCAN);
+        switch ($mode) {
+            case static::MODE_SCAN:
+                $socket->write('SCAN ' . $tmpName);
+                break;
+            case static::MODE_INSTREAM:
+                $this->sendInstream($tmpName, $socket);
+                break;
+            default:
+                throw new \OutOfBoundsException(sprintf('Invalid scan mode: %s', $mode));
+        }
+
 
         return $socket->read();
+    }
+
+    /**
+     * Send a chunked file using INSTREAM mode to clamd
+     *
+     * @param string $tmpName path to the file
+     * @param Socket $socket socket to write
+     */
+    protected function sendInstream($tmpName, $socket)
+    {
+        $fhandler = fopen($tmpName, "r");
+        $streamMaxLength = Configure::read('CakeDC/Clamav.streamMaxLength', 25 * 1024 * 1024);
+        if (!$fhandler) {
+            throw new \OutOfBoundsException(sprintf('Unable to open file: %s', $tmpName));
+        }
+
+
+        $socket->write("nINSTREAM" . PHP_EOL);
+
+        while (!feof($fhandler)) {
+            $chunk = fread($fhandler, $streamMaxLength);
+            $chunckLength= pack('N', strlen($chunk));
+            $socket->write($chunckLength . $chunk);
+        }
+        fclose($fhandler);
+
+        // sending a 0 bytes chunk to flag the end of the stream
+        $socket->write(pack('N', 0));
     }
 
     /**
