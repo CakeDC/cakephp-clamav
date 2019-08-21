@@ -89,7 +89,6 @@ class ClamdValidation extends Validator
                 throw new \OutOfBoundsException(sprintf('Invalid scan mode: %s', $mode));
         }
 
-
         return $socket->read();
     }
 
@@ -107,12 +106,11 @@ class ClamdValidation extends Validator
             throw new \OutOfBoundsException(sprintf('Unable to open file: %s', $tmpName));
         }
 
-
         $socket->write("nINSTREAM" . PHP_EOL);
 
         while (!feof($fhandler)) {
             $chunk = fread($fhandler, $streamMaxLength);
-            $chunckLength= pack('N', strlen($chunk));
+            $chunckLength = pack('N', strlen($chunk));
             $socket->write($chunckLength . $chunk);
         }
         fclose($fhandler);
