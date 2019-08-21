@@ -34,7 +34,7 @@ class ClamdValidation extends Validator
     /**
      * Use clamd socket to scan the uploaded tmp file
      *
-     * @param $check value to check
+     * @param mixed $check value to check
      * @return bool|string
      */
     public function fileHasNoVirusesFound($check)
@@ -133,7 +133,7 @@ class ClamdValidation extends Validator
     /**
      * Check scan result and return error msg or true if OK
      *
-     * @param $result string result from clamad
+     * @param string $result result from clamad
      * @return bool|string
      */
     protected function checkScanResult(string $result)
