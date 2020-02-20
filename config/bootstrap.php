@@ -1,17 +1,19 @@
 <?php
-\Cake\Core\Configure::write('CakeDC/Clamav', [
-    // WARNING, disabling will SKIP virus check in validation rules
-    'enabled' => true,
-    'mode' => \CakeDC\Clamav\Validation\ClamdValidation::MODE_SCAN,
-    // Only used if mode is INSTREAM, value of StreamMaxLength (check clamd configuration file) in bytes
-    'streamMaxLength' => 25 * 1024 * 1024,
-    // clamd listening in this socket, defaults to unix file socket
-    'socketConfig' => [
-        'host' => 'unix:///var/run/clamav/clamd.ctl',
-        'port' => null,
-        'persistent' => true
-    ],
-]);
+if (!\Cake\Core\Configure::read('CakeDC/Clamav')) {
+    \Cake\Core\Configure::write('CakeDC/Clamav', [
+        // WARNING, disabling will SKIP virus check in validation rules
+        'enabled' => true,
+        'mode' => \CakeDC\Clamav\Validation\ClamdValidation::MODE_SCAN,
+        // Only used if mode is INSTREAM, value of StreamMaxLength (check clamd configuration file) in bytes
+        'streamMaxLength' => 25 * 1024 * 1024,
+        // clamd listening in this socket, defaults to unix file socket
+        'socketConfig' => [
+            'host' => 'unix:///var/run/clamav/clamd.ctl',
+            'port' => null,
+            'persistent' => true
+        ],
+    ]);
+}
 
 /*
  * Examples
