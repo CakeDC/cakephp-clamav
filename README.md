@@ -37,6 +37,27 @@ Setup
 ]);
 ```
 
+Usage
+-----
+
+For example, if you are using the `attachment` field to upload a file in a form, you can check for viruses using this code snippet in the related Table `validationDefault` method.
+
+```php
+if (Configure::read('CakeDC/Clamav.enabled')) {
+            if (!$validator->getProvider('clamd')) {
+                $validator->setProvider('clamd', new ClamdValidation());
+            }
+            $validator->add(
+                'attachment',
+                'noVirus',
+                [
+                    'rule' => 'fileHasNoVirusesFound',
+                    'provider' => 'clamd',
+                ]
+            );
+        }
+```
+
 Support
 -------
 
