@@ -12,8 +12,8 @@ ClamAV integration with CakePHP via Validator
 Requirements
 ------------
 
-* CakePHP 3.8.0+
-* PHP 7.2+
+* CakePHP 4.0+
+* PHP 7.4+
 * Clamd (daemon) up and running, connection via socket
 
 Setup
