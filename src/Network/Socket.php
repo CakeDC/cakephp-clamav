@@ -25,7 +25,7 @@ class Socket extends BaseSocket
      * Override to allow using file sockets
      * @return bool
      */
-    public function connect()
+    public function connect(): bool
     {
         if ($this->connection) {
             $this->disconnect();

@@ -24,7 +24,7 @@ use Cake\TestSuite\TestCase;
  */
 class ClamdValidationTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->ClamdValidation = new ClamdValidation();
@@ -33,7 +33,7 @@ class ClamdValidationTest extends TestCase
         ]);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->ClamdValidation = null;
         Cache::drop('_cake_core_');
