@@ -24,6 +24,7 @@ class Socket extends BaseSocket
 {
     /**
      * Override to allow using file sockets
+     *
      * @return bool
      */
     public function connect(): bool
@@ -34,7 +35,7 @@ class Socket extends BaseSocket
 
         $hasProtocol = str_contains($this->_config['host'], '://');
         if ($hasProtocol) {
-            list($this->_config['protocol'], $this->_config['host']) = explode('://', $this->_config['host']);
+            [$this->_config['protocol'], $this->_config['host']] = explode('://', $this->_config['host']);
         }
         $scheme = null;
         if (!empty($this->_config['protocol'])) {

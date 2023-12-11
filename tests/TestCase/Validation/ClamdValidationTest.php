@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace CakeDC\Clamav\Test\TestCase\Validation;
 
-use CakeDC\Clamav\Network\Socket;
-use CakeDC\Clamav\Validation\ClamdValidation;
 use Cake\Cache\Cache;
 use Cake\Cache\Engine\NullEngine;
 use Cake\Core\Configure;
 use Cake\Network\Exception\SocketException;
 use Cake\TestSuite\TestCase;
+use CakeDC\Clamav\Network\Socket;
+use CakeDC\Clamav\Validation\ClamdValidation;
 
 /**
  * @property ClamdValidation ClamdValidation
@@ -61,7 +61,7 @@ class ClamdValidationTest extends TestCase
         Configure::write('CakeDC/Clamav.enabled', true);
 
         $result = $this->ClamdValidation->fileHasNoVirusesFound('not-found');
-        $this->assertSame("Path to uploaded file not found", $result);
+        $this->assertSame('Path to uploaded file not found', $result);
     }
 
     /**
@@ -136,7 +136,7 @@ class ClamdValidationTest extends TestCase
             ->getMock();
         $socketMock->expects($this->once())
             ->method('write')
-            ->with("SCAN " . $filePath)
+            ->with('SCAN ' . $filePath)
             ->willReturn(1);
         $socketMock->expects($this->once())
             ->method('read')

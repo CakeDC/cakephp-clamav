@@ -24,7 +24,7 @@ if (!Configure::read('CakeDC/Clamav')) {
         'socketConfig' => [
             'host' => 'unix:///var/run/clamav/clamd.ctl',
             'port' => null,
-            'persistent' => true
+            'persistent' => true,
         ],
     ]);
 }

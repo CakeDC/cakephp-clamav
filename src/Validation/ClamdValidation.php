@@ -12,11 +12,11 @@ declare(strict_types=1);
  */
 namespace CakeDC\Clamav\Validation;
 
-use Cake\Network\Socket as BaseSocket;
-use CakeDC\Clamav\Network\Socket;
 use Cake\Core\Configure;
 use Cake\Log\Log;
+use Cake\Network\Socket as BaseSocket;
 use Cake\Validation\Validator;
+use CakeDC\Clamav\Network\Socket;
 use Exception;
 use function Cake\I18n\__d;
 
@@ -28,13 +28,13 @@ use function Cake\I18n\__d;
  */
 class ClamdValidation extends Validator
 {
-    const TMP_UPLOAD_KEY = 'tmp_name';
+    public const TMP_UPLOAD_KEY = 'tmp_name';
 
     // SCAN mode will check files in the local filesystem
-    const MODE_SCAN = 'SCAN';
+    public const MODE_SCAN = 'SCAN';
 
     // INSTREAM mode will send the file as a stream to the server
-    const MODE_INSTREAM = 'INSTREAM';
+    public const MODE_INSTREAM = 'INSTREAM';
 
     /**
      * Use clamd socket to scan the uploaded tmp file
@@ -102,15 +102,16 @@ class ClamdValidation extends Validator
      *
      * @param string $tmpName path to the file
      * @param \Cake\Network\Socket $socket socket to write
+     * @return void
      */
     protected function sendInstream(string $tmpName, BaseSocket $socket): void
     {
-        $fhandler = fopen($tmpName, "r");
+        $fhandler = fopen($tmpName, 'r');
         $streamMaxLength = Configure::read('CakeDC/Clamav.streamMaxLength', 25 * 1024 * 1024);
         if (!$fhandler) {
             throw new \OutOfBoundsException(sprintf('Unable to open file: %s', $tmpName));
         }
-        $socket->write("nINSTREAM" . PHP_EOL);
+        $socket->write('nINSTREAM' . PHP_EOL);
         while (!feof($fhandler)) {
             $chunk = fread($fhandler, $streamMaxLength);
             $chunckLength = pack('N', strlen($chunk));
@@ -121,14 +122,13 @@ class ClamdValidation extends Validator
         // sending a 0 bytes chunk to flag the end of the stream
 
         $socket->write(pack('N', 0));
-
     }
 
     /**
      * Get Socket instance for DI
      *
      * @param array $config socket configuration
-     * @return Socket
+     * @return \CakeDC\Clamav\Network\Socket
      */
     protected function getSocketInstance(array $config): Socket
     {
