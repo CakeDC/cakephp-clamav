@@ -70,7 +70,7 @@ class ClamdValidation extends Validator
             return $message;
         }
 
-        return $this->checkScanResult($scanResult);
+        return $this->checkScanResult($scanResult ?? '');
     }
 
     /**
@@ -113,7 +113,7 @@ class ClamdValidation extends Validator
         }
         $socket->write('nINSTREAM' . PHP_EOL);
         while (!feof($fhandler)) {
-            $chunk = fread($fhandler, $streamMaxLength);
+            $chunk = fread($fhandler, $streamMaxLength) ?: '';
             $chunckLength = pack('N', strlen($chunk));
             $socket->write($chunckLength . $chunk);
         }
@@ -127,7 +127,7 @@ class ClamdValidation extends Validator
     /**
      * Get Socket instance for DI
      *
-     * @param array $config socket configuration
+     * @param array<string, mixed> $config socket configuration
      * @return \CakeDC\Clamav\Network\Socket
      */
     protected function getSocketInstance(array $config): Socket

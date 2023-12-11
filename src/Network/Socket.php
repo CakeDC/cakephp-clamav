@@ -59,7 +59,9 @@ class Socket extends BaseSocket
         if ($this->_config['port'] !== null) {
             $remoteSocketTarget .= ':' . $this->_config['port'];
         }
-        $this->connection = stream_socket_client(
+        $errNum = 0;
+        $errStr = '';
+        $this->connection = $this->_getStreamSocketClient(
             $remoteSocketTarget,
             $errNum,
             $errStr,
@@ -81,7 +83,9 @@ class Socket extends BaseSocket
 
         $this->connected = is_resource($this->connection);
         if ($this->connected) {
-            stream_set_timeout($this->connection, $this->_config['timeout']);
+            assert($this->connection !== null);
+
+            stream_set_timeout($this->connection, (int)$this->_config['timeout']);
         }
 
         return $this->connected;
