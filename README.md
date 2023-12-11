@@ -1,4 +1,4 @@
-CakeDC\Clamav for CakePHP
+aCakeDC\Clamav for CakePHP
 ===================
 
 [![Build Status](https://secure.travis-ci.org/cakedc/cakephp-clamav.png?branch=master)](http://travis-ci.org/cakedc/cakephp-clamav)
@@ -12,8 +12,8 @@ ClamAV integration with CakePHP via Validator
 Requirements
 ------------
 
-* CakePHP 4.0+
-* PHP 7.4+
+* CakePHP 5.0+
+* PHP 8.1+
 * Clamd (daemon) up and running, connection via socket
 
 Setup
@@ -25,7 +25,9 @@ Setup
 * Configure the plugin using
 
 ```php
-\Cake\Core\Configure::write('CakeDC/Clamav', [
+use Cake\Core\Configure;
+
+Configure::write('CakeDC/Clamav', [
     // WARNING, disabling will SKIP virus check in validation rules
     'enabled' => true,
     // clamd listening in this socket, defaults to unix file socket
@@ -40,22 +42,25 @@ Setup
 Usage
 -----
 
-For example, if you are using the `attachment` field to upload a file in a form, you can check for viruses using this code snippet in the related Table `validationDefault` method.
+For example, if you are using the `attachment` field to upload a file in a form, you can check for viruses
+using this code snippet in the related Table `validationDefault` method.
 
 ```php
+use Cake\Core\Configure;
+
 if (Configure::read('CakeDC/Clamav.enabled')) {
-            if (!$validator->getProvider('clamd')) {
-                $validator->setProvider('clamd', new ClamdValidation());
-            }
-            $validator->add(
-                'attachment',
-                'noVirus',
-                [
-                    'rule' => 'fileHasNoVirusesFound',
-                    'provider' => 'clamd',
-                ]
-            );
-        }
+    if (!$validator->getProvider('clamd')) {
+        $validator->setProvider('clamd', new ClamdValidation());
+    }
+    $validator->add(
+        'attachment',
+        'noVirus',
+        [
+            'rule' => 'fileHasNoVirusesFound',
+            'provider' => 'clamd',
+        ]
+    );
+}
 ```
 
 Support
@@ -68,11 +73,13 @@ Commercial support is also available, [contact us](https://www.cakedc.com/contac
 Contributing
 ------------
 
-This repository follows the [CakeDC Plugin Standard](https://www.cakedc.com/plugin-standard). If you'd like to contribute new features, enhancements or bug fixes to the plugin, please read our [Contribution Guidelines](https://www.cakedc.com/contribution-guidelines) for detailed instructions.
+This repository follows the [CakeDC Plugin Standard](https://www.cakedc.com/plugin-standard). If you'd like to contribute new features, enhancements or
+bug fixes to the plugin, please read our [Contribution Guidelines](https://www.cakedc.com/contribution-guidelines) for detailed instructions.
 
 License
 -------
 
-Copyright 2018 Cake Development Corporation (CakeDC). All rights reserved.
+Copyright 2013-2023 Cake Development Corporation (CakeDC). All rights reserved.
 
-Licensed under the [MIT](http://www.opensource.org/licenses/mit-license.php) License. Redistributions of the source code included in this repository must retain the copyright notice found in each file.
+Licensed under the [MIT](http://www.opensource.org/licenses/mit-license.php) License. Redistributions of the source code included in this repository must retain
+the copyright notice found in each file.

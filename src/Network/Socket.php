@@ -1,14 +1,15 @@
 <?php
+declare(strict_types=1);
+
 /**
- * Copyright 2010 - 2019, Cake Development Corporation (https://www.cakedc.com)
+ * Copyright 2013 - 2023, Cake Development Corporation (https://www.cakedc.com)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright Copyright 2010 - 2019, Cake Development Corporation (https://www.cakedc.com)
+ * @copyright Copyright 2013 - 2023, Cake Development Corporation (https://www.cakedc.com)
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-
 namespace CakeDC\Clamav\Network;
 
 use Cake\Network\Exception\SocketException;
@@ -31,7 +32,7 @@ class Socket extends BaseSocket
             $this->disconnect();
         }
 
-        $hasProtocol = strpos($this->_config['host'], '://') !== false;
+        $hasProtocol = str_contains($this->_config['host'], '://');
         if ($hasProtocol) {
             list($this->_config['protocol'], $this->_config['host']) = explode('://', $this->_config['host']);
         }

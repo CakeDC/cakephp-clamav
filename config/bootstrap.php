@@ -1,9 +1,23 @@
 <?php
-if (!\Cake\Core\Configure::read('CakeDC/Clamav')) {
-    \Cake\Core\Configure::write('CakeDC/Clamav', [
+declare(strict_types=1);
+
+/**
+ * Copyright 2013 - 2023, Cake Development Corporation (https://www.cakedc.com)
+ *
+ * Licensed under The MIT License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright Copyright 2013 - 2023, Cake Development Corporation (https://www.cakedc.com)
+ * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
+ */
+use Cake\Core\Configure;
+use CakeDC\Clamav\Validation\ClamdValidation;
+
+if (!Configure::read('CakeDC/Clamav')) {
+    Configure::write('CakeDC/Clamav', [
         // WARNING, disabling will SKIP virus check in validation rules
         'enabled' => true,
-        'mode' => \CakeDC\Clamav\Validation\ClamdValidation::MODE_SCAN,
+        'mode' => ClamdValidation::MODE_SCAN,
         // Only used if mode is INSTREAM, value of StreamMaxLength (check clamd configuration file) in bytes
         'streamMaxLength' => 25 * 1024 * 1024,
         // clamd listening in this socket, defaults to unix file socket

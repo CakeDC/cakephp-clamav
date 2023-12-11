@@ -1,15 +1,17 @@
 <?php
+declare(strict_types=1);
+
 /**
- * Copyright 2010 - 2019, Cake Development Corporation (https://www.cakedc.com)
+ * Copyright 2013 - 2023, Cake Development Corporation (https://www.cakedc.com)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright Copyright 2010 - 2019, Cake Development Corporation (https://www.cakedc.com)
+ * @copyright Copyright 2013 - 2023, Cake Development Corporation (https://www.cakedc.com)
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-namespace CakeDC\Clamd\Test\Validation;
+namespace CakeDC\Clamav\Test\TestCase\Validation;
 
 use CakeDC\Clamav\Network\Socket;
 use CakeDC\Clamav\Validation\ClamdValidation;
@@ -45,8 +47,10 @@ class ClamdValidationTest extends TestCase
      */
     public function testValidationReturnTrueByDefaultYouNeedToEnableItInConfiguration()
     {
+        Configure::write('CakeDC/Clamav.enabled', false);
         $result = $this->ClamdValidation->fileHasNoVirusesFound('not-found');
         $this->assertTrue($result);
+        Configure::write('CakeDC/Clamav.enabled', true);
     }
 
     /**
@@ -69,7 +73,7 @@ class ClamdValidationTest extends TestCase
         Configure::write('CakeDC/Clamav.enabled', true);
         $check = ['tmp_name' => TESTS . 'Fixture/files/testfile.txt'];
         $clamdValidatorMock = $this->getMockBuilder(ClamdValidation::class)
-            ->setMethods(['clamdScan'])
+            ->onlyMethods(['clamdScan'])
             ->getMock();
         $clamdValidatorMock->expects($this->once())
             ->method('clamdScan')
@@ -88,14 +92,14 @@ class ClamdValidationTest extends TestCase
         $filePath = TESTS . 'Fixture/files/testfile.txt';
         $check = ['tmp_name' => $filePath];
         $clamdValidatorMock = $this->getMockBuilder(ClamdValidation::class)
-            ->setMethods(['clamdScan'])
+            ->onlyMethods(['clamdScan'])
             ->getMock();
         $clamdValidatorMock->expects($this->once())
             ->method('clamdScan')
             ->with($filePath)
             ->willThrowException(new SocketException('Something went wrong...'));
         $result = $clamdValidatorMock->fileHasNoVirusesFound($check);
-        $this->assertContains("Exception while checking the file {$filePath} for viruses: Something went wrong...", $result);
+        $this->assertStringContainsString("Exception while checking the file {$filePath} for viruses: Something went wrong...", $result);
     }
 
     /**
@@ -107,7 +111,7 @@ class ClamdValidationTest extends TestCase
         Configure::write('CakeDC/Clamav.enabled', true);
         $check = ['tmp_name' => TESTS . 'Fixture/files/testfile.txt'];
         $clamdValidatorMock = $this->getMockBuilder(ClamdValidation::class)
-            ->setMethods(['clamdScan'])
+            ->onlyMethods(['clamdScan'])
             ->getMock();
         $clamdValidatorMock->expects($this->once())
             ->method('clamdScan')
@@ -128,17 +132,17 @@ class ClamdValidationTest extends TestCase
         $filePath = TESTS . 'Fixture/files/testfile.txt';
         $check = ['tmp_name' => $filePath];
         $socketMock = $this->getMockBuilder(Socket::class)
-            ->setMethods(['write', 'read'])
+            ->onlyMethods(['write', 'read'])
             ->getMock();
-        $socketMock->expects($this->at(0))
+        $socketMock->expects($this->once())
             ->method('write')
             ->with("SCAN " . $filePath)
-            ->willReturn(true);
-        $socketMock->expects($this->at(1))
+            ->willReturn(1);
+        $socketMock->expects($this->once())
             ->method('read')
             ->willReturn('virus.exe some virus OK' . PHP_EOL);
         $clamdValidatorMock = $this->getMockBuilder(ClamdValidation::class)
-            ->setMethods(['getSocketInstance'])
+            ->onlyMethods(['getSocketInstance'])
             ->getMock();
         $clamdValidatorMock->expects($this->once())
             ->method('getSocketInstance')
@@ -159,25 +163,20 @@ class ClamdValidationTest extends TestCase
         $filePath = TESTS . 'Fixture/files/testfile.txt';
         $check = ['tmp_name' => $filePath];
         $socketMock = $this->getMockBuilder(Socket::class)
-            ->setMethods(['write', 'read'])
+            ->onlyMethods(['write', 'read'])
             ->getMock();
-        $socketMock->expects($this->at(0))
+
+        $socketMock
+            ->expects($this->exactly(3))
             ->method('write')
-            ->with("nINSTREAM" . PHP_EOL)
-            ->willReturn(true);
-        $socketMock->expects($this->at(1))
-            ->method('write')
-            ->with("\000\000\000!this file might contain a v1rus ?")
-            ->willReturn(true);
-        $socketMock->expects($this->at(2))
-            ->method('write')
-            ->with("\000\000\000\000")
-            ->willReturn(true);
-        $socketMock->expects($this->at(3))
+            ->willReturnCallback(fn(string $key): int => strlen($key));
+
+        $socketMock->expects($this->once())
             ->method('read')
             ->willReturn('virus.exe some virus OK' . PHP_EOL);
+
         $clamdValidatorMock = $this->getMockBuilder(ClamdValidation::class)
-            ->setMethods(['getSocketInstance'])
+            ->onlyMethods(['getSocketInstance'])
             ->getMock();
         $clamdValidatorMock->expects($this->once())
             ->method('getSocketInstance')

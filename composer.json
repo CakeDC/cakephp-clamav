@@ -4,10 +4,12 @@
     "type": "cakephp-plugin",
     "license": "MIT",
     "require": {
-        "cakephp/cakephp": "^4.0"
+        "php": ">=8.1",
+        "cakephp/cakephp": "^5.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7.14|^6.0"
+        "phpunit/phpunit": "^10.0",
+        "cakephp/cakephp-codesniffer": "^4.0"
     },
     "autoload": {
         "psr-4": {
@@ -18,6 +20,30 @@
         "psr-4": {
             "Cake\\Test\\": "vendor/cakephp/cakephp/tests/",
             "CakeDC\\Clamav\\Test\\": "tests/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs --colors --parallel=16 -p src/ tests/",
+        "cs-fix": "phpcbf --colors --parallel=16 -p src/ tests/",
+        "phpstan": "tools/phpstan analyse",
+        "psalm": "tools/psalm --show-info=false",
+        "stan": [
+            "@phpstan",
+            "@psalm"
+        ],
+        "phpstan-tests": "tools/phpstan analyze -c tests/phpstan.neon",
+        "phpstan-baseline": "tools/phpstan --generate-baseline",
+        "psalm-baseline": "tools/psalm  --set-baseline=psalm-baseline.xml",
+        "stan-setup": "phive install",
+        "test": "phpunit"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }
