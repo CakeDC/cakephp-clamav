@@ -1,4 +1,4 @@
-aCakeDC\Clamav for CakePHP
+CakeDC\Clamav for CakePHP
 ===================
 
 [![Build Status](https://secure.travis-ci.org/cakedc/cakephp-clamav.png?branch=master)](http://travis-ci.org/cakedc/cakephp-clamav)
@@ -47,6 +47,7 @@ using this code snippet in the related Table `validationDefault` method.
 
 ```php
 use Cake\Core\Configure;
+use CakeDC\Clamav\Validation\ClamdValidation;
 
 if (Configure::read('CakeDC/Clamav.enabled')) {
     if (!$validator->getProvider('clamd')) {
