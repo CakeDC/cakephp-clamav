@@ -2,7 +2,7 @@ Changelog
 =========
 
 * 3.0.0
-  * CakePHP 5.0 compatible release
+  * CakePHP 5.1 compatible release
 
 * 2.0.0
   * CakePHP 4.0 compatible release

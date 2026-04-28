@@ -2,22 +2,22 @@
 declare(strict_types=1);
 
 /**
- * Copyright 2013 - 2023, Cake Development Corporation (https://www.cakedc.com)
+ * Copyright 2013 - 2026, Cake Development Corporation (https://www.cakedc.com)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright Copyright 2013 - 2023, Cake Development Corporation (https://www.cakedc.com)
+ * @copyright Copyright 2013 - 2026, Cake Development Corporation (https://www.cakedc.com)
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 namespace CakeDC\Clamav\Validation;
 
 use Cake\Core\Configure;
 use Cake\Log\Log;
-use Cake\Network\Socket as BaseSocket;
+use Cake\Network\Socket;
 use Cake\Validation\Validator;
-use CakeDC\Clamav\Network\Socket;
 use Exception;
+use OutOfBoundsException;
 use function Cake\I18n\__d;
 
 /**
@@ -40,7 +40,7 @@ class ClamdValidation extends Validator
      * Use clamd socket to scan the uploaded tmp file
      *
      * @param mixed $check value to check
-     * @return bool|string
+     * @return string|bool
      */
     public function fileHasNoVirusesFound(mixed $check): bool|string
     {
@@ -63,7 +63,7 @@ class ClamdValidation extends Validator
                 '{0} while checking the file {1} for viruses: {2}',
                 get_class($ex),
                 $tmpName,
-                $ex->getMessage()
+                $ex->getMessage(),
             );
             Log::warning($message);
 
@@ -91,7 +91,7 @@ class ClamdValidation extends Validator
                 $this->sendInstream($tmpName, $socket);
                 break;
             default:
-                throw new \OutOfBoundsException(sprintf('Invalid scan mode: %s', $mode));
+                throw new OutOfBoundsException(sprintf('Invalid scan mode: %s', $mode));
         }
 
         return $socket->read();
@@ -104,12 +104,12 @@ class ClamdValidation extends Validator
      * @param \Cake\Network\Socket $socket socket to write
      * @return void
      */
-    protected function sendInstream(string $tmpName, BaseSocket $socket): void
+    protected function sendInstream(string $tmpName, Socket $socket): void
     {
         $fhandler = fopen($tmpName, 'r');
         $streamMaxLength = Configure::read('CakeDC/Clamav.streamMaxLength', 25 * 1024 * 1024);
         if (!$fhandler) {
-            throw new \OutOfBoundsException(sprintf('Unable to open file: %s', $tmpName));
+            throw new OutOfBoundsException(sprintf('Unable to open file: %s', $tmpName));
         }
         $socket->write('nINSTREAM' . PHP_EOL);
         while (!feof($fhandler)) {
@@ -128,7 +128,7 @@ class ClamdValidation extends Validator
      * Get Socket instance for DI
      *
      * @param array<string, mixed> $config socket configuration
-     * @return \CakeDC\Clamav\Network\Socket
+     * @return \Cake\Network\Socket
      */
     protected function getSocketInstance(array $config): Socket
     {
@@ -139,7 +139,7 @@ class ClamdValidation extends Validator
      * Check scan result and return error msg or true if OK
      *
      * @param string $result result from clamad
-     * @return bool|string
+     * @return string|bool
      */
     protected function checkScanResult(string $result): bool|string
     {
