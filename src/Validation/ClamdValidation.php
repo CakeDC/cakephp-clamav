@@ -12,12 +12,14 @@ declare(strict_types=1);
  */
 namespace CakeDC\Clamav\Validation;
 
+use ArrayAccess;
 use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\Network\Socket;
 use Cake\Validation\Validator;
 use Exception;
 use OutOfBoundsException;
+use Psr\Http\Message\UploadedFileInterface;
 use function Cake\I18n\__d;
 
 /**
@@ -49,8 +51,16 @@ class ClamdValidation extends Validator
             return true;
         }
 
-        $tmpName = $check[static::TMP_UPLOAD_KEY] ?? null;
-        $tmpName = (string)$tmpName;
+        // On CakePHP 5 the request always yields UploadedFileInterface objects, never the
+        // legacy $_FILES array, so `$check['tmp_name']` fatals with
+        // "Cannot use object of type ... as array".
+        if ($check instanceof UploadedFileInterface) {
+            $tmpName = (string)$check->getStream()->getMetadata('uri');
+        } elseif (is_array($check) || $check instanceof ArrayAccess) {
+            $tmpName = (string)($check[static::TMP_UPLOAD_KEY] ?? null);
+        } else {
+            $tmpName = is_scalar($check) ? (string)$check : '';
+        }
         if (!$tmpName || !file_exists($tmpName)) {
             return __d('cake_d_c/clamav', 'Path to uploaded file not found');
         }
